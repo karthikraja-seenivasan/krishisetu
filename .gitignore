@@ -1,0 +1,78 @@
+# ==============================================================================
+# KrishiSetu Monorepo Git Ignore Config
+# ==============================================================================
+
+# 📄 Implementation / planning docs (local agent & MVP spec — not for git)
+implementation.md
+agent.md
+wireframes.md
+
+# ☕ Java Backend (api/)
+api/target/
+api/release/*.jar
+api/.mvn/wrapper/maven-wrapper.jar
+api/bin/
+api/out/
+api/src/main/resources/application-local.yml
+api/src/main/resources/application-prod.yml
+
+# ⚛️ Next.js Frontend (web/)
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/.env
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/pnpm-debug.log*
+
+# 📦 Dependency Managers / Locks / Local packages
+node_modules/
+.pnpm-store/
+
+# 🖥️ IDE / Text Editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+.project
+.classpath
+.settings/
+.DS_Store
+Thumbs.db
+
+# 🧪 Test Reports & Coverage logs
+api/build/
+api/jacoco.exec
+api/target/site/jacoco/
+web/coverage/
+web/test-results/
+
+# 🔧 Environment & Configuration Secrets
+.env
+.env*.local
+*.secret
+*.secret.*
+
+# 📋 Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 🖱️ Cursor / local agent tooling
+.cursor/
+
+# 📦 EC2 / local deploy bundles
+deploy-bundle/
+*.zip

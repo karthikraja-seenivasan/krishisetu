@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: krishisetu-api
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/krishisetu}
+    username: ${DB_USER:krishisetu}
+    password: ${DB_PASSWORD:changeme}
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway owns the schema
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: native
+
+krishisetu:
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+  external:
+    open-meteo:
+      base-url: https://api.open-meteo.com
+    nasa-power:
+      base-url: https://power.larc.nasa.gov
+    agmarknet:
+      base-url: https://api.data.gov.in
+      api-key: ${AGMARKNET_API_KEY:}
+    soilgrids:
+      base-url: https://rest.isric.org
+
+logging:
+  level:
+    root: INFO
+    com.krishisetu: ${LOG_LEVEL:INFO}
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENV:local}
+  traces-sample-rate: 0.1

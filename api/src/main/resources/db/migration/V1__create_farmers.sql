@@ -1,0 +1,10 @@
+CREATE TABLE farmers (
+    id UUID PRIMARY KEY,
+    phone_hash VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    district VARCHAR(255) NOT NULL,
+    lat DECIMAL(8, 5),
+    lon DECIMAL(8, 5),
+    preferred_lang VARCHAR(10) NOT NULL DEFAULT 'kn',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);

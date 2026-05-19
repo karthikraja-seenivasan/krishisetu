@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FAF7F0; /* Warm cream */
+  --foreground: #1A2E1F; /* Brand dark text */
+  --border: #E8E2D5;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom interactive active state styling */
+.active-nav-item {
+  color: #2D7A3A;
+  font-weight: 600;
+}
+
+.inactive-nav-item {
+  color: #5B5249;
+}
+
+/* Big contrast buttons and input shadows */
+input:focus {
+  outline: 2px solid #2D7A3A;
+  outline-offset: 1px;
+}
+
+/* Tabular figures for financial tables and stats */
+.font-tabular {
+  font-feature-settings: "tnum";
+}

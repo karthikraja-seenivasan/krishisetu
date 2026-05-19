@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: spotless-check
+        name: Spotless Check (Java)
+        entry: cmd /c "cd api && mvn spotless:check"
+        language: system
+        files: \.java$
+        pass_filenames: false
+
+      - id: prettier-check
+        name: Prettier Check (Frontend)
+        entry: cmd /c "cd web && pnpm prettier --check ."
+        language: system
+        files: \.(ts|tsx|js|jsx|json|css|md)$
+        pass_filenames: false

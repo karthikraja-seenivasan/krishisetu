@@ -1,0 +1,320 @@
+{
+  "_comment": "ICAR / Karnataka Department of Agriculture (Agriclinic guidelines) 2025-2026. Approved crop matrix database for Kolar district dryland and irrigated agriculture.",
+  "crops": [
+    {
+      "cropId": "tomato",
+      "cropNameEn": "Tomato",
+      "cropNameKn": "ಟೊಮ್ಯಾಟೋ",
+      "minRainfallMm": 400.0,
+      "maxRainfallMm": 800.0,
+      "minTempC": 18.0,
+      "maxTempC": 32.0,
+      "minSoilPh": 6.0,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 52000.0,
+      "typicalYieldQPerAcre": 180.0,
+      "growthDurationDays": 110,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 800.0,
+        "high": 1500.0,
+        "modal": 1200.0
+      }
+    },
+    {
+      "cropId": "ragi",
+      "cropNameEn": "Ragi (Finger Millet)",
+      "cropNameKn": "ರಾಗಿ",
+      "minRainfallMm": 300.0,
+      "maxRainfallMm": 600.0,
+      "minTempC": 15.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 5.0,
+      "maxSoilPh": 8.2,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 12000.0,
+      "typicalYieldQPerAcre": 15.0,
+      "growthDurationDays": 120,
+      "waterRequirementLevel": "LOW",
+      "typicalPriceBand": {
+        "low": 3500.0,
+        "high": 4200.0,
+        "modal": 3840.0
+      }
+    },
+    {
+      "cropId": "groundnut",
+      "cropNameEn": "Groundnut",
+      "cropNameKn": "ನೆಲಗಡಲೆ",
+      "minRainfallMm": 350.0,
+      "maxRainfallMm": 700.0,
+      "minTempC": 20.0,
+      "maxTempC": 30.0,
+      "minSoilPh": 6.0,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 18000.0,
+      "typicalYieldQPerAcre": 12.0,
+      "growthDurationDays": 115,
+      "waterRequirementLevel": "LOW",
+      "typicalPriceBand": {
+        "low": 5500.0,
+        "high": 6800.0,
+        "modal": 6300.0
+      }
+    },
+    {
+      "cropId": "mango",
+      "cropNameEn": "Mango",
+      "cropNameKn": "ಮಾವು",
+      "minRainfallMm": 500.0,
+      "maxRainfallMm": 1000.0,
+      "minTempC": 22.0,
+      "maxTempC": 38.0,
+      "minSoilPh": 5.5,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Loam",
+      "typicalInputCostPerAcre": 35000.0,
+      "typicalYieldQPerAcre": 40.0,
+      "growthDurationDays": 365,
+      "waterRequirementLevel": "LOW",
+      "typicalPriceBand": {
+        "low": 3000.0,
+        "high": 6000.0,
+        "modal": 4500.0
+      }
+    },
+    {
+      "cropId": "mulberry",
+      "cropNameEn": "Mulberry (Sericulture)",
+      "cropNameKn": "ಹಿಪ್ಪುನೇರಳೆ",
+      "minRainfallMm": 600.0,
+      "maxRainfallMm": 1200.0,
+      "minTempC": 20.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 6.2,
+      "maxSoilPh": 7.8,
+      "preferredSoilTexture": "Clay Loam",
+      "typicalInputCostPerAcre": 25000.0,
+      "typicalYieldQPerAcre": 120.0,
+      "growthDurationDays": 365,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 2500.0,
+        "high": 4000.0,
+        "modal": 3200.0
+      }
+    },
+    {
+      "cropId": "potato",
+      "cropNameEn": "Potato",
+      "cropNameKn": "ಆಲೂಗಡ್ಡೆ",
+      "minRainfallMm": 450.0,
+      "maxRainfallMm": 800.0,
+      "minTempC": 15.0,
+      "maxTempC": 25.0,
+      "minSoilPh": 5.2,
+      "maxSoilPh": 6.5,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 45000.0,
+      "typicalYieldQPerAcre": 100.0,
+      "growthDurationDays": 90,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 1200.0,
+        "high": 2200.0,
+        "modal": 1700.0
+      }
+    },
+    {
+      "cropId": "maize",
+      "cropNameEn": "Maize",
+      "cropNameKn": "ಮೆಕ್ಕೆಜೋಳ",
+      "minRainfallMm": 400.0,
+      "maxRainfallMm": 900.0,
+      "minTempC": 18.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 5.8,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Clay Loam",
+      "typicalInputCostPerAcre": 16000.0,
+      "typicalYieldQPerAcre": 28.0,
+      "growthDurationDays": 110,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 1800.0,
+        "high": 2400.0,
+        "modal": 2100.0
+      }
+    },
+    {
+      "cropId": "paddy",
+      "cropNameEn": "Paddy (Rice)",
+      "cropNameKn": "ಭತ್ತ",
+      "minRainfallMm": 800.0,
+      "maxRainfallMm": 1800.0,
+      "minTempC": 20.0,
+      "maxTempC": 38.0,
+      "minSoilPh": 5.5,
+      "maxSoilPh": 7.2,
+      "preferredSoilTexture": "Clay",
+      "typicalInputCostPerAcre": 26000.0,
+      "typicalYieldQPerAcre": 22.0,
+      "growthDurationDays": 135,
+      "waterRequirementLevel": "HIGH",
+      "typicalPriceBand": {
+        "low": 2100.0,
+        "high": 2600.0,
+        "modal": 2300.0
+      }
+    },
+    {
+      "cropId": "sunflower",
+      "cropNameEn": "Sunflower",
+      "cropNameKn": "ಸೂರ್ಯಕಾಂತಿ",
+      "minRainfallMm": 450.0,
+      "maxRainfallMm": 750.0,
+      "minTempC": 18.0,
+      "maxTempC": 34.0,
+      "minSoilPh": 6.5,
+      "maxSoilPh": 8.0,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 14000.0,
+      "typicalYieldQPerAcre": 8.0,
+      "growthDurationDays": 100,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 5000.0,
+        "high": 6200.0,
+        "modal": 5600.0
+      }
+    },
+    {
+      "cropId": "pulses",
+      "cropNameEn": "Pulses (Red Gram)",
+      "cropNameKn": "ತೊಗರಿ",
+      "minRainfallMm": 300.0,
+      "maxRainfallMm": 600.0,
+      "minTempC": 18.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 6.5,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Loam",
+      "typicalInputCostPerAcre": 11000.0,
+      "typicalYieldQPerAcre": 7.0,
+      "growthDurationDays": 140,
+      "waterRequirementLevel": "LOW",
+      "typicalPriceBand": {
+        "low": 6500.0,
+        "high": 7800.0,
+        "modal": 7000.0
+      }
+    },
+    {
+      "cropId": "onion",
+      "cropNameEn": "Onion",
+      "cropNameKn": "ಈರುಳ್ಳಿ",
+      "minRainfallMm": 350.0,
+      "maxRainfallMm": 700.0,
+      "minTempC": 15.0,
+      "maxTempC": 30.0,
+      "minSoilPh": 6.0,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 28000.0,
+      "typicalYieldQPerAcre": 80.0,
+      "growthDurationDays": 120,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 1500.0,
+        "high": 3000.0,
+        "modal": 2100.0
+      }
+    },
+    {
+      "cropId": "chilli",
+      "cropNameEn": "Chilli",
+      "cropNameKn": "ಮೆಣಸಿನಕಾಯಿ",
+      "minRainfallMm": 400.0,
+      "maxRainfallMm": 800.0,
+      "minTempC": 20.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 6.0,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Loam",
+      "typicalInputCostPerAcre": 32000.0,
+      "typicalYieldQPerAcre": 15.0,
+      "growthDurationDays": 150,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 12000.0,
+        "high": 18000.0,
+        "modal": 15000.0
+      }
+    },
+    {
+      "cropId": "brinjal",
+      "cropNameEn": "Brinjal (Eggplant)",
+      "cropNameKn": "ಬದನೆಕಾಯಿ",
+      "minRainfallMm": 450.0,
+      "maxRainfallMm": 900.0,
+      "minTempC": 18.0,
+      "maxTempC": 35.0,
+      "minSoilPh": 5.5,
+      "maxSoilPh": 6.8,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 22000.0,
+      "typicalYieldQPerAcre": 120.0,
+      "growthDurationDays": 130,
+      "waterRequirementLevel": "MEDIUM",
+      "typicalPriceBand": {
+        "low": 1000.0,
+        "high": 1800.0,
+        "modal": 1400.0
+      }
+    },
+    {
+      "cropId": "marigold",
+      "cropNameEn": "Marigold",
+      "cropNameKn": "ಚೆಂಡು ಹೂವು",
+      "minRainfallMm": 300.0,
+      "maxRainfallMm": 700.0,
+      "minTempC": 15.0,
+      "maxTempC": 30.0,
+      "minSoilPh": 6.5,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Sandy Loam",
+      "typicalInputCostPerAcre": 15000.0,
+      "typicalYieldQPerAcre": 40.0,
+      "growthDurationDays": 90,
+      "waterRequirementLevel": "LOW",
+      "typicalPriceBand": {
+        "low": 2000.0,
+        "high": 4000.0,
+        "modal": 3000.0
+      }
+    },
+    {
+      "cropId": "sugarcane",
+      "cropNameEn": "Sugarcane",
+      "cropNameKn": "ಕಬ್ಬು",
+      "minRainfallMm": 1100.0,
+      "maxRainfallMm": 1500.0,
+      "minTempC": 20.0,
+      "maxTempC": 40.0,
+      "minSoilPh": 6.0,
+      "maxSoilPh": 7.5,
+      "preferredSoilTexture": "Clay Loam",
+      "typicalInputCostPerAcre": 65000.0,
+      "typicalYieldQPerAcre": 350.0,
+      "growthDurationDays": 365,
+      "waterRequirementLevel": "HIGH",
+      "typicalPriceBand": {
+        "low": 300.0,
+        "high": 350.0,
+        "modal": 325.0
+      }
+    }
+  ]
+}

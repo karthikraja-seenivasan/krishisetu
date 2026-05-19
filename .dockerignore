@@ -1,0 +1,12 @@
+# Root ignore configs
+node_modules
+.next
+.git
+.github
+target
+.mvn
+*.jar
+*.db
+api/target
+web/node_modules
+web/.next

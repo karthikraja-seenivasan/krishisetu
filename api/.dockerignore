@@ -1,0 +1,12 @@
+# Full multi-stage build (Dockerfile) — exclude sources not needed in builder context
+target
+.mvn
+mvnw
+mvnw.cmd
+.git
+.github
+*.db
+
+# JAR-only runtime build (Dockerfile.runtime) — allow the pre-built artifact only
+*.jar
+!release/app.jar

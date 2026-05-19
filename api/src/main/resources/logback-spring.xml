@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <springProfile name="!prod">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [req_id=%X{request_id:-}] - %msg%n</pattern>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE" />
+    </root>
+  </springProfile>
+
+  <springProfile name="prod">
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+        <providers>
+          <timestamp>
+            <timeZone>UTC</timeZone>
+          </timestamp>
+          <pattern>
+            <pattern>
+              {
+                "timestamp": "%date{yyyy-MM-dd'T'HH:mm:ss.SSS'Z'}",
+                "level": "%level",
+                "thread": "%thread",
+                "logger": "%logger",
+                "message": "%message",
+                "request_id": "%mdc{request_id}",
+                "exception": "%ex"
+              }
+            </pattern>
+          </pattern>
+        </providers>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="JSON_CONSOLE" />
+    </root>
+  </springProfile>
+</configuration>

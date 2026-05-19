@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: krishisetu-postgres
+    environment:
+      POSTGRES_DB: krishisetu
+      POSTGRES_USER: krishisetu
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U krishisetu -d krishisetu"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    # Uses multi-stage Dockerfile (Maven build inside Docker). For EC2 JAR-only deploy,
+    # use: docker compose -f docker-compose.ec2.yml up -d --build
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: krishisetu-api
+    ports:
+      - '8080:8080'
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/krishisetu
+      - DB_USER=krishisetu
+      - DB_PASSWORD=changeme
+      - CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: krishisetu-web
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    driver: local

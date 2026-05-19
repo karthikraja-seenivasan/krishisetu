@@ -1,0 +1,77 @@
+name: KrishiSetu CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Java Backend (api/) Checks & Tests
+  # ----------------------------------------------------------------------------
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Spotless Format Check
+        run: cd api && ./mvnw spotless:check
+
+      - name: Checkstyle Check
+        run: cd api && ./mvnw checkstyle:check
+
+      - name: Compile and Verify (Run Unit & Integration Tests)
+        run: cd api && ./mvnw verify
+
+      - name: Upload JaCoCo Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: api/target/site/jacoco/
+
+  # ----------------------------------------------------------------------------
+  # TypeScript Frontend (web/) Checks & Tests
+  # ----------------------------------------------------------------------------
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: cd web && pnpm install --frozen-lockfile
+
+      - name: Prettier Format Check
+        run: cd web && pnpm prettier --check .
+
+      - name: ESLint Linting
+        run: cd web && pnpm lint
+
+      - name: TypeScript Type-check
+        run: cd web && pnpm typecheck
+
+      - name: Run Unit Tests
+        run: cd web && pnpm test
