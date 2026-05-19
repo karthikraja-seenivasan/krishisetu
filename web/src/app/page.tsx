@@ -3,8 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchJson } from "@/lib/api-client";
 import { Language, translations } from "@/lib/dictionary";
+import type { CropRecommendation, ListingResponse, MandiPriceEntry, Season } from "@/lib/api-types";
+import {
+  getCropRecommendations,
+  getFarmerListings,
+  getMandiPrices,
+  getWeather,
+  registerFarmer,
+  weatherChartData,
+} from "@/lib/krishisetu-api";
 import {
   Sprout,
   CloudSun,
@@ -53,76 +61,8 @@ const DISTRICTS: District[] = [
   { nameEn: "Tumakuru", nameKn: "ತುಮಕೂರು", lat: 13.34, lon: 77.10 }
 ];
 
-// Backend DTO interfaces
-interface HourlyForecast {
-  time: string;
-  temperature: number;
-  precipitationProbability: number;
-}
-
-interface WeatherSummary {
-  latitude: number;
-  longitude: number;
-  historicalAverageTemperature: number;
-  minTemperature: number;
-  maxTemperature: number;
-  apparentTemperature: number;
-  relativeHumidity: number;
-  weatherCondition: string;
-  windSpeed: number;
-  historicalAveragePrecipitation: number;
-  hourlyForecasts: HourlyForecast[];
-}
-
-interface PriceBand {
-  low: number;
-  high: number;
-  modal: number;
-}
-
-interface ProjectedNetReturn {
-  lowReturn: number;
-  highReturn: number;
-}
-
-interface CropRecommendation {
-  cropId: string;
-  cropNameEn: string;
-  cropNameKn: string;
-  suitabilityScore: number;
-  rationale: string;
-  typicalYieldQPerAcre: number;
-  typicalPriceBand: PriceBand;
-  typicalInputCostPerAcre: number;
-  projectedNetReturn: ProjectedNetReturn;
-}
-
-interface CropListing {
-  id: string;
-  farmerId: string;
-  cropId: string;
-  quantityQ: number;
-  harvestDate: string;
-  photoUrl: string;
-  expectedPricePerQ: number;
-  createdAt: string;
-}
-
-interface MandiPriceEntry {
-  state: string;
-  district: string;
-  market: string;
-  commodity: string;
-  variety: string;
-  grade: string;
-  arrivalDate: string;
-  minPrice: number;
-  maxPrice: number;
-  modalPrice: number;
-}
-
 type ScreenState = "WELCOME" | "ONBOARDING" | "DASHBOARD";
-type SeasonType = "KHARIF" | "RABI" | "SUMMER";
+type SeasonType = Season;
 type ActiveTabType = "home" | "crops" | "sell" | "profile";
 
 export default function App() {
@@ -177,13 +117,10 @@ export default function App() {
     data: weatherData,
     isLoading: isWeatherLoading,
     error: weatherError
-  } = useQuery<WeatherSummary>({
+  } = useQuery({
     queryKey: ["weather", selectedDistrict.lat, selectedDistrict.lon],
-    queryFn: () =>
-      fetchJson<WeatherSummary>(
-        `/api/v1/weather?lat=${selectedDistrict.lat}&lon=${selectedDistrict.lon}`
-      ),
-    enabled: currentScreen === "DASHBOARD"
+    queryFn: () => getWeather(selectedDistrict.lat, selectedDistrict.lon),
+    enabled: currentScreen === "DASHBOARD",
   });
 
   const {
@@ -193,30 +130,26 @@ export default function App() {
   } = useQuery<CropRecommendation[]>({
     queryKey: ["crops", selectedDistrict.lat, selectedDistrict.lon, season],
     queryFn: () =>
-      fetchJson<CropRecommendation[]>(
-        `/api/v1/crops/recommend?lat=${selectedDistrict.lat}&lon=${selectedDistrict.lon}&season=${season}`
-      ),
-    enabled: currentScreen === "DASHBOARD"
+      getCropRecommendations(selectedDistrict.lat, selectedDistrict.lon, season),
+    enabled: currentScreen === "DASHBOARD" && activeTab === "crops",
   });
 
-  // Fetch active listings for this registered farmer
   const {
     data: activeListings,
     isLoading: isListingsLoading
-  } = useQuery<CropListing[]>({
+  } = useQuery<ListingResponse[]>({
     queryKey: ["listings", farmerId],
-    queryFn: () => fetchJson<CropListing[]>(`/api/v1/listings/farmer/${farmerId}`),
-    enabled: !!farmerId && currentScreen === "DASHBOARD" && activeTab === "sell"
+    queryFn: () => getFarmerListings(farmerId!),
+    enabled: !!farmerId && currentScreen === "DASHBOARD" && activeTab === "sell",
   });
 
-  // Fetch government Mandi pricing indexes
   const {
     data: allMandiPrices,
     isLoading: isPricesLoading
   } = useQuery<MandiPriceEntry[]>({
-    queryKey: ["allPrices"],
-    queryFn: () => fetchJson<MandiPriceEntry[]>("/api/v1/prices"),
-    enabled: currentScreen === "DASHBOARD" && activeTab === "sell"
+    queryKey: ["allPrices", selectedDistrict.nameEn],
+    queryFn: () => getMandiPrices("Tomato", selectedDistrict.nameEn),
+    enabled: currentScreen === "DASHBOARD" && activeTab === "sell",
   });
 
   const handleLanguageToggle = () => {
@@ -247,40 +180,29 @@ export default function App() {
     }
 
     try {
-      // Perform live backend registration
-      const regResponse = await fetchJson<{ id: string }>("/api/v1/farmers", {
-        method: "POST",
-        body: JSON.stringify({
-          name: farmerName,
-          phone: phoneNumber,
-          district: selectedDistrict.nameEn,
-          preferredLang: lang  // backend expects lowercase "en" or "kn"
-        })
+      const regResponse = await registerFarmer({
+        name: farmerName,
+        phone: phoneNumber,
+        district: selectedDistrict.nameEn,
+        preferredLang: lang,
       });
 
-      if (regResponse && regResponse.id) {
-        setFarmerId(regResponse.id);
-        if (typeof window !== "undefined") {
-          localStorage.setItem("krishisetu_farmer_id", regResponse.id);
-          localStorage.setItem("krishisetu_farmer_name", farmerName);
-          localStorage.setItem("krishisetu_farmer_phone", phoneNumber);
-          localStorage.setItem("krishisetu_lang", lang);
-        }
-      }
-      setFormErrors({});
-      setCurrentScreen("DASHBOARD");
-    } catch (err: any) {
-      // Fallback robust mode so registration works beautifully for demo even offline
-      const mockId = "99b50e2d-dc99-43ef-b387-052637738f61";
-      setFarmerId(mockId);
+      setFarmerId(regResponse.id);
       if (typeof window !== "undefined") {
-        localStorage.setItem("krishisetu_farmer_id", mockId);
+        localStorage.setItem("krishisetu_farmer_id", regResponse.id);
         localStorage.setItem("krishisetu_farmer_name", farmerName);
         localStorage.setItem("krishisetu_farmer_phone", phoneNumber);
         localStorage.setItem("krishisetu_lang", lang);
       }
       setFormErrors({});
       setCurrentScreen("DASHBOARD");
+    } catch {
+      setFormErrors({
+        submit:
+          lang === "kn"
+            ? "ನೋಂದಣಿ ವಿಫಲವಾಗಿದೆ. API ಚಾಲನೆಯಲ್ಲಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ."
+            : "Registration failed. Ensure the API is running on port 8080.",
+      });
     }
   };
 
@@ -519,7 +441,13 @@ export default function App() {
             </div>
 
             {/* Submit Button */}
-            <div className="mt-8">
+            <div className="mt-8 space-y-3">
+              {formErrors.submit && (
+                <p className="text-brand-danger text-sm flex items-center gap-1.5 font-medium">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{formErrors.submit}</span>
+                </p>
+              )}
               <button
                 type="submit"
                 className="w-full h-14 bg-brand-green-700 hover:bg-brand-green-800 active:scale-[0.98] text-white rounded-button font-bold text-lg flex items-center justify-center gap-2 shadow-md transition-all"
@@ -584,7 +512,7 @@ export default function App() {
                     </div>
                     {weatherData && (
                       <span className="text-xs font-bold px-2 py-0.5 bg-brand-saffron/10 text-brand-saffron rounded border border-brand-saffron/20">
-                        {weatherData.weatherCondition}
+                        {weatherData.condition}
                       </span>
                     )}
                   </div>
@@ -609,7 +537,7 @@ export default function App() {
                               {t.tempLabel}
                             </span>
                             <span className="text-3xl font-bold font-tabular text-brand-textPrimary block mt-1">
-                              {weatherData.apparentTemperature.toFixed(1)}°C
+                              {weatherData.currentTemperature.toFixed(1)}°C
                             </span>
                             <span className="text-xs text-brand-textMuted mt-1 block">
                               Min: {weatherData.minTemperature}°C · Max: {weatherData.maxTemperature}°C
@@ -621,10 +549,10 @@ export default function App() {
                               {t.humidityLabel}
                             </span>
                             <span className="text-3xl font-bold font-tabular text-brand-textPrimary block mt-1">
-                              {weatherData.relativeHumidity}%
+                              {weatherData.precipitationProbability}%
                             </span>
                             <span className="text-xs text-brand-textMuted mt-1 block">
-                              Wind: {weatherData.windSpeed} km/h
+                              {lang === "kn" ? "ಮಳೆಯ ಸಾಧ್ಯತೆ" : "Rain probability today"}
                             </span>
                           </div>
                         </div>
@@ -637,7 +565,7 @@ export default function App() {
                           <div className="h-44 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart
-                                data={weatherData.hourlyForecasts.slice(0, 7)}
+                                data={weatherChartData(weatherData)}
                                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                               >
                                 <XAxis dataKey="time" tick={{ fill: "#5B5249", fontSize: 11 }} />
@@ -804,7 +732,7 @@ export default function App() {
                                   {t.typicalYield}
                                 </span>
                                 <span className="text-base font-bold text-brand-textPrimary mt-0.5 block">
-                                  {rec.typicalYieldQPerAcre} q/acre
+                                  {rec.expectedYieldQPerAcre} q/acre
                                 </span>
                               </div>
                               <div>
@@ -812,7 +740,7 @@ export default function App() {
                                   {t.typicalPrice}
                                 </span>
                                 <span className="text-base font-bold text-brand-textPrimary mt-0.5 block">
-                                  ₹{formatNumber(rec.typicalPriceBand.modal)}/q
+                                  ₹{formatNumber(rec.expectedPriceBandPerQ.modal)}/q
                                 </span>
                               </div>
                               <div>
@@ -820,7 +748,7 @@ export default function App() {
                                   {t.inputCost}
                                 </span>
                                 <span className="text-base font-bold text-brand-textPrimary mt-0.5 block">
-                                  ₹{formatNumber(rec.typicalInputCostPerAcre)}
+                                  ₹{formatNumber(rec.inputCostPerAcre)}
                                 </span>
                               </div>
                             </div>
@@ -832,7 +760,7 @@ export default function App() {
                                   {t.projectedNetReturn}
                                 </span>
                                 <span className="text-lg font-bold text-brand-green-800 mt-1 block">
-                                  ₹{formatNumber(rec.projectedNetReturn.lowReturn)} - ₹{formatNumber(rec.projectedNetReturn.highReturn)}
+                                  ₹{formatNumber(rec.projectedNetReturnPerAcre.low)} - ₹{formatNumber(rec.projectedNetReturnPerAcre.high)}
                                 </span>
                               </div>
                               <span className="text-[11px] font-bold text-brand-green-700 uppercase tracking-wider px-2 py-0.5 bg-brand-green-100 rounded border border-brand-green-700/20">

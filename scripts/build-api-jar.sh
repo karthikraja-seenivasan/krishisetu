@@ -6,7 +6,7 @@ API="$ROOT/api"
 JAR_NAME="krishisetu-api-0.0.1-SNAPSHOT.jar"
 RELEASE_JAR="$API/release/app.jar"
 
-echo "==> Building API JAR (Maven runs only on this machine, not on EC2)..."
+echo "==> Building API JAR (Maven runs on the host, not inside Docker)..."
 cd "$API"
 ./mvnw clean package -DskipTests -Dspotless.check.skip=true -Dcheckstyle.skip=true
 
@@ -18,11 +18,11 @@ fi
 mkdir -p release
 cp "target/$JAR_NAME" "$RELEASE_JAR"
 
-echo "==> Ready for EC2 Docker build:"
+echo "==> Ready for Docker build:"
 echo "    $RELEASE_JAR"
 echo ""
 echo "Copy to server:"
-echo "  scp -r api/release api/Dockerfile.runtime docker-compose.ec2.yml user@host:/opt/krishisetu/"
+echo "  scp -r api/release api/Dockerfile docker-compose.yml .env user@host:/opt/krishisetu/"
 echo ""
-echo "On EC2:"
-echo "  docker compose -f docker-compose.ec2.yml up -d --build"
+echo "On server:"
+echo "  docker compose up -d --build"

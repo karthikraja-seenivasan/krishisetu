@@ -1,3 +1,14 @@
+# KrishiSetu stack — API container runs a pre-built JAR only (no Maven in Docker).
+#
+# 1. Build the API JAR on the host (once per API change):
+#      ./scripts/build-api-jar.sh        (Linux/macOS)
+#      .\scripts\build-api-jar.ps1       (Windows)
+#
+# 2. Start postgres, API, and web:
+#      docker compose up -d --build
+#
+# Optional: copy api/release, api/Dockerfile, and this file to a server, then run step 2 there.
+
 services:
   postgres:
     image: postgres:15-alpine
@@ -5,53 +16,60 @@ services:
     environment:
       POSTGRES_DB: krishisetu
       POSTGRES_USER: krishisetu
-      POSTGRES_PASSWORD: changeme
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     ports:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U krishisetu -d krishisetu"]
+      test: ['CMD-SHELL', 'pg_isready -U krishisetu -d krishisetu']
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   api:
-    # Uses multi-stage Dockerfile (Maven build inside Docker). For EC2 JAR-only deploy,
-    # use: docker compose -f docker-compose.ec2.yml up -d --build
     build:
       context: ./api
       dockerfile: Dockerfile
+    image: krishisetu-api:latest
     container_name: krishisetu-api
     ports:
       - '8080:8080'
     environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/krishisetu
-      - DB_USER=krishisetu
-      - DB_PASSWORD=changeme
-      - CORS_ORIGINS=http://localhost:3000
+      DATABASE_URL: jdbc:postgresql://postgres:5432/krishisetu
+      DB_USER: krishisetu
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      AGMARKNET_API_KEY: ${AGMARKNET_API_KEY:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENV: ${SENTRY_ENV:-local}
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
       interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 20s
+      retries: 5
+      start_period: 25s
+    restart: unless-stopped
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     container_name: krishisetu-web
     ports:
       - '3000:3000'
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   pgdata:

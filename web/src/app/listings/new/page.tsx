@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { fetchJson } from "@/lib/api-client";
+import type { MandiPriceEntry } from "@/lib/api-types";
+import { createListing, getMandiPrices } from "@/lib/krishisetu-api";
 import {
   ArrowLeft,
   Camera,
@@ -15,19 +16,6 @@ import {
   AlertCircle,
   Check
 } from "lucide-react";
-
-interface MandiPriceEntry {
-  state: string;
-  district: string;
-  market: string;
-  commodity: string;
-  variety: string;
-  grade: string;
-  arrivalDate: string;
-  minPrice: number;
-  maxPrice: number;
-  modalPrice: number;
-}
 
 const CROPS = [
   { id: "tomato", nameEn: "Tomato", nameKn: "ಟೊಮ್ಯಾಟೋ", icon: "🍅", color: "bg-red-50 text-red-700 border-red-200 hover:border-red-500" },
@@ -68,7 +56,7 @@ export default function NewListingPage() {
   const cropLabel = CROPS.find((c) => c.id === selectedCrop)?.nameEn || "Tomato";
   const { data: mandiPrices } = useQuery<MandiPriceEntry[]>({
     queryKey: ["mandiPrices", cropLabel],
-    queryFn: () => fetchJson<MandiPriceEntry[]>(`/api/v1/prices?commodity=${cropLabel}`),
+    queryFn: () => getMandiPrices(cropLabel, "Kolar"),
     enabled: !!selectedCrop
   });
 
@@ -105,11 +93,7 @@ export default function NewListingPage() {
 
   // Mutation to save crop listing to database
   const listingMutation = useMutation({
-    mutationFn: (body: any) =>
-      fetchJson("/api/v1/listings", {
-        method: "POST",
-        body: JSON.stringify(body)
-      }),
+    mutationFn: createListing,
     onSuccess: () => {
       setShowSuccess(true);
       setTimeout(() => {
@@ -142,11 +126,18 @@ export default function NewListingPage() {
 
     setFormErrors({});
 
-    // Fallback farmer registered profile if missing
-    const resolvedFarmerId = farmerId || "99b50e2d-dc99-43ef-b387-052637738f61";
+    if (!farmerId) {
+      setFormErrors({
+        submit:
+          lang === "kn"
+            ? "ಮೊದಲು ಮುಖಪುಟದಿಂದ ನೋಂದಣಿ ಮಾಡಿ."
+            : "Please complete onboarding on the home page first.",
+      });
+      return;
+    }
 
     listingMutation.mutate({
-      farmerId: resolvedFarmerId,
+      farmerId,
       cropId: selectedCrop,
       quantityQ: parseFloat(quantity),
       harvestDate,

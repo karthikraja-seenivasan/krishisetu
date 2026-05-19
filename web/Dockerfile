@@ -11,8 +11,8 @@ RUN npm ci --legacy-peer-deps
 # Copy workspace source files
 COPY . .
 
-# Set default env variables for building
-ENV NEXT_PUBLIC_API_URL=http://localhost:8080
+ARG NEXT_PUBLIC_API_URL=http://localhost:8080
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Disable telemetry and build static assets
 ENV NEXT_TELEMETRY_DISABLED=1

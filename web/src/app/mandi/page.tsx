@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchJson } from "@/lib/api-client";
+import type { MandiPriceEntry } from "@/lib/api-types";
+import { getMandiPrices } from "@/lib/krishisetu-api";
 import {
   ArrowLeft,
   IndianRupee,
@@ -15,19 +16,6 @@ import {
   AlertCircle,
   MapPin
 } from "lucide-react";
-
-interface MandiPriceEntry {
-  state: string;
-  district: string;
-  market: string;
-  commodity: string;
-  variety: string;
-  grade: string;
-  arrivalDate: string;
-  minPrice: number;
-  maxPrice: number;
-  modalPrice: number;
-}
 
 const COMMODITIES = ["Tomato", "Ragi", "Groundnut", "Maize", "Onion", "Chilli"];
 const DISTRICTS = ["Kolar", "Chickballapur", "Tumkur", "Bangalore Rural"];
@@ -41,10 +29,7 @@ export default function MandiPage() {
 
   const { data: prices, isLoading, error } = useQuery<MandiPriceEntry[]>({
     queryKey: ["mandi-prices", selectedCommodity, selectedDistrict],
-    queryFn: () =>
-      fetchJson<MandiPriceEntry[]>(
-        `/api/v1/prices?commodity=${selectedCommodity}&district=${selectedDistrict}&days=14`
-      )
+    queryFn: () => getMandiPrices(selectedCommodity, selectedDistrict, 14)
   });
 
   const filteredPrices = (prices || []).filter((p) => {

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchJson } from "@/lib/api-client";
+import { getMandiPrices } from "@/lib/krishisetu-api";
+import type { MandiPriceEntry } from "@/lib/api-types";
 import {
   ArrowLeft,
   TrendingUp,
@@ -16,19 +17,6 @@ import {
   Compass,
   CheckCircle
 } from "lucide-react";
-
-interface MandiPriceEntry {
-  state: string;
-  district: string;
-  market: string;
-  commodity: string;
-  variety: string;
-  grade: string;
-  arrivalDate: string;
-  minPrice: number;
-  maxPrice: number;
-  modalPrice: number;
-}
 
 const CROP_METADATA: Record<
   string,
@@ -272,7 +260,7 @@ export default function CropDetailPage() {
   // Fetch live Mandi prices for this commodity
   const { data: mandiPrices, isLoading: isPricesLoading } = useQuery<MandiPriceEntry[]>({
     queryKey: ["mandiPrices", crop.cropNameEn],
-    queryFn: () => fetchJson<MandiPriceEntry[]>(`/api/v1/prices?commodity=${crop.cropNameEn}`)
+    queryFn: () => getMandiPrices(crop.cropNameEn, "Kolar")
   });
 
   const acres = parseFloat(farmAcres) || 0;

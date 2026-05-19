@@ -4,7 +4,7 @@ $Api = Join-Path $Root "api"
 $JarName = "krishisetu-api-0.0.1-SNAPSHOT.jar"
 $ReleaseJar = Join-Path $Api "release\app.jar"
 
-Write-Host "==> Building API JAR (Maven runs only on this machine, not on EC2)..."
+Write-Host "==> Building API JAR (Maven runs on the host, not inside Docker)..."
 Push-Location $Api
 try {
   if (Test-Path ".\mvnw.cmd") {
@@ -21,11 +21,11 @@ try {
   New-Item -ItemType Directory -Force -Path (Join-Path $Api "release") | Out-Null
   Copy-Item -Force $BuiltJar $ReleaseJar
 
-  Write-Host "==> Ready for EC2 Docker build:"
+  Write-Host "==> Ready for Docker build:"
   Write-Host "    $ReleaseJar"
   Write-Host ""
-  Write-Host "On EC2:"
-  Write-Host "  docker compose -f docker-compose.ec2.yml up -d --build"
+  Write-Host "On server:"
+  Write-Host "  docker compose up -d --build"
 } finally {
   Pop-Location
 }
