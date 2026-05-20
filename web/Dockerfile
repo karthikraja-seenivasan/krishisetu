@@ -31,13 +31,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Copy next built assets and production node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
+COPY --from=builder /app/server-https.js ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 3000 3443
 
 # Set healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+  CMD wget --no-check-certificate --no-verbose --tries=1 --spider ${HEALTHCHECK_URL:-http://localhost:3000/} || exit 1
 
 CMD ["npm", "run", "start"]

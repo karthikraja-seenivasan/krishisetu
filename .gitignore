@@ -62,6 +62,8 @@ web/test-results/
 .env*.local
 *.secret
 *.secret.*
+certs/*
+!certs/README.md
 
 # 📋 Logs
 *.log

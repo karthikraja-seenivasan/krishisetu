@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Language, translations } from "@/lib/dictionary";
 import type { CropRecommendation, ListingResponse, MandiPriceEntry, Season } from "@/lib/api-types";
+import { API_BASE_URL } from "@/lib/api-client";
 import {
   getCropRecommendations,
   getFarmerListings,
@@ -196,12 +197,13 @@ export default function App() {
       }
       setFormErrors({});
       setCurrentScreen("DASHBOARD");
-    } catch {
+    } catch (error) {
+      const details = error instanceof Error ? error.message : "Unable to reach the API.";
       setFormErrors({
         submit:
           lang === "kn"
             ? "ನೋಂದಣಿ ವಿಫಲವಾಗಿದೆ. API ಚಾಲನೆಯಲ್ಲಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ."
-            : "Registration failed. Ensure the API is running on port 8080.",
+            : `Registration failed. Check the API at ${API_BASE_URL}. ${details}`,
       });
     }
   };

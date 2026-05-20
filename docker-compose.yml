@@ -7,6 +7,9 @@
 # 2. Start postgres, API, and web:
 #      docker compose up -d --build
 #
+# For app-level HTTPS, set SERVER_SSL_ENABLED=true, SERVER_PORT=8443,
+# WEB_START_COMMAND="npm run start:https", PORT=3443, and mount certs under ./certs.
+#
 # Optional: copy api/release, api/Dockerfile, and this file to a server, then run step 2 there.
 
 services:
@@ -35,20 +38,28 @@ services:
     image: krishisetu-api:latest
     container_name: krishisetu-api
     ports:
-      - '8080:8080'
+      - '${API_PUBLISHED_PORT:-8080}:${SERVER_PORT:-8080}'
     environment:
       DATABASE_URL: jdbc:postgresql://postgres:5432/krishisetu
       DB_USER: krishisetu
       DB_PASSWORD: ${DB_PASSWORD:-changeme}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      SERVER_SSL_ENABLED: ${SERVER_SSL_ENABLED:-false}
+      SERVER_SSL_KEY_STORE: ${SERVER_SSL_KEY_STORE:-/certs/api/keystore.p12}
+      SERVER_SSL_KEY_STORE_PASSWORD: ${SERVER_SSL_KEY_STORE_PASSWORD:-}
+      SERVER_SSL_KEY_STORE_TYPE: ${SERVER_SSL_KEY_STORE_TYPE:-PKCS12}
+      SERVER_SSL_KEY_ALIAS: ${SERVER_SSL_KEY_ALIAS:-springboot}
       AGMARKNET_API_KEY: ${AGMARKNET_API_KEY:-}
       SENTRY_DSN: ${SENTRY_DSN:-}
       SENTRY_ENV: ${SENTRY_ENV:-local}
+    volumes:
+      - ${API_TLS_KEYSTORE_DIR:-./certs/api}:/certs/api:ro
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      test: ['CMD-SHELL', 'curl -fk ${API_HEALTHCHECK_URL:-http://127.0.0.1:8080/health}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,12 +71,24 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL-http://localhost:8080}
     container_name: krishisetu-web
     ports:
-      - '3000:3000'
+      - '${WEB_PUBLISHED_PORT:-3000}:${PORT:-3000}'
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL-http://localhost:8080}
+      API_PROXY_TARGET: ${API_PROXY_TARGET:-}
+      API_PROXY_TLS_REJECT_UNAUTHORIZED: ${API_PROXY_TLS_REJECT_UNAUTHORIZED:-true}
+      PORT: ${PORT:-3000}
+      HTTPS_PORT: ${HTTPS_PORT:-}
+      HTTPS_HOST: ${HTTPS_HOST:-0.0.0.0}
+      HTTPS_KEY_PATH: ${HTTPS_KEY_PATH:-/certs/web/privkey.pem}
+      HTTPS_CERT_PATH: ${HTTPS_CERT_PATH:-/certs/web/fullchain.pem}
+      HTTPS_CA_PATH: ${HTTPS_CA_PATH:-}
+      HEALTHCHECK_URL: ${WEB_HEALTHCHECK_URL:-http://127.0.0.1:3000/}
+    command: sh -c "${WEB_START_COMMAND:-npm run start}"
+    volumes:
+      - ${WEB_TLS_CERT_DIR:-./certs/web}:/certs/web:ro
     depends_on:
       api:
         condition: service_started

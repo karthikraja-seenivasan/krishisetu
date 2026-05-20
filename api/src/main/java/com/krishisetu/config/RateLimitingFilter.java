@@ -19,8 +19,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Custom servlet filter implementing API rate limiting using Bucket4j.
- * Limits each unique IP address to 60 requests per minute.
+ * Custom servlet filter implementing API rate limiting using Bucket4j. Limits each unique IP
+ * address to 60 requests per minute.
  */
 @Component
 @Order(-105) // Ensure this runs early, just before or around security filters
@@ -40,9 +40,9 @@ public class RateLimitingFilter implements Filter {
       throws IOException, ServletException {
     if (request instanceof final HttpServletRequest httpRequest
         && response instanceof final HttpServletResponse httpResponse) {
-      
+
       final var path = httpRequest.getRequestURI();
-      
+
       // Apply rate limiting only to API routes
       if (path.startsWith("/api/v1/")) {
         final var ip = httpRequest.getRemoteAddr();
@@ -52,11 +52,12 @@ public class RateLimitingFilter implements Filter {
           httpResponse.setStatus(429); // Too Many Requests
           httpResponse.setContentType("application/json");
           httpResponse.setCharacterEncoding("UTF-8");
-          
-          final var jsonPayload = String.format(
-              "{\"status\":429,\"error\":\"Too Many Requests\",\"message\":\"Rate limit exceeded. Please try again later.\",\"timestamp\":\"%s\"}",
-              Instant.now().toString()
-          );
+
+          final var jsonPayload =
+              String.format(
+                  "{\"status\":429,\"error\":\"Too Many Requests\",\"message\":\"Rate limit"
+                      + " exceeded. Please try again later.\",\"timestamp\":\"%s\"}",
+                  Instant.now().toString());
           httpResponse.getWriter().write(jsonPayload);
           return;
         }
