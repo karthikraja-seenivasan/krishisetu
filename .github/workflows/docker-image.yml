@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   push:
@@ -20,7 +20,15 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Spring Boot App
-        run: mvn clean package -DskipTests
+        working-directory: api
+        run: |
+          chmod +x ./mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Prepare API Docker artifact
+        run: |
+          mkdir -p api/release
+          cp api/target/krishisetu-api-0.0.1-SNAPSHOT.jar api/release/app.jar
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -28,10 +36,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
+      - name: Build API Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/krishisetu:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/krishisetu-api:latest ./api
 
-      - name: Push Docker image
+      - name: Build Web Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/krishisetu:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/krishisetu-web:latest ./web
+
+      - name: Push API Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/krishisetu-api:latest
+
+      - name: Push Web Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/krishisetu-web:latest
